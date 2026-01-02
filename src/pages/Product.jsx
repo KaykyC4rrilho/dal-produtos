@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+'use client';
+
+import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  ShoppingCart, 
-  MessageCircle, 
-  Star, 
-  Shield, 
-  Truck, 
+import { motion } from 'framer-motion';
+import {
+  ArrowLeft,
+  ShoppingCart,
+  MessageCircle,
+  Star,
+  Shield,
+  Truck,
   BadgeCheck,
   Tag,
   Box,
   CheckCircle2,
-  Clock,
   Package
 } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import Header from '@/components/landing/Header';
@@ -34,27 +34,33 @@ export default function Product() {
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get('id');
 
-  const { data: scanner, isLoading } = useQuery({
-    queryKey: ['scanner', productId],
+  const { data: scanners = [], isLoading } = useQuery({
+    queryKey: ['scanners'],
     queryFn: async () => {
-      const scanners = await base44.entities.Scanner.list();
-      return scanners.find(s => s.id === productId);
+      const res = await fetch('/api/produtos');
+      if (!res.ok) throw new Error('Erro ao buscar scanners');
+      return res.json();
     },
-    enabled: !!productId,
+    initialData: [],
   });
 
-  const { data: relatedScanners = [] } = useQuery({
-    queryKey: ['related-scanners', scanner?.brand],
-    queryFn: () => base44.entities.Scanner.filter({ brand: scanner.brand }, '-created_date', 4),
-    enabled: !!scanner?.brand,
-  });
+  const scanner = useMemo(() => {
+    return scanners.find(s => s.id.toString() === productId);
+  }, [scanners, productId]);
+
+  const relatedScanners = useMemo(() => {
+    if (!scanner?.brand) return [];
+    return scanners
+      .filter(s => s.brand === scanner.brand && s.id.toString() !== scanner.id.toString())
+      .slice(0, 4);
+  }, [scanners, scanner]);
 
   const handlePurchase = () => {
     if (!scanner?.purchase_link) return;
-    
+
     if (scanner.purchase_link.includes('whatsapp') || scanner.purchase_link.includes('wa.me')) {
       const message = encodeURIComponent(`Olá, tenho interesse no scanner ${scanner.model} que vi no site.`);
-      const whatsappUrl = scanner.purchase_link.includes('?') 
+      const whatsappUrl = scanner.purchase_link.includes('?')
         ? `${scanner.purchase_link}&text=${message}`
         : `${scanner.purchase_link}?text=${message}`;
       window.open(whatsappUrl, '_blank');
@@ -92,14 +98,9 @@ export default function Product() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Back Button */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="mb-8"
-        >
+        {/* Botão de Voltar */}
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-8">
           <Link to={createPageUrl('Home')}>
             <Button variant="ghost" className="text-slate-600 hover:text-[#F20505]">
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -108,9 +109,9 @@ export default function Product() {
           </Link>
         </motion.div>
 
-        {/* Product Section */}
+        {/* Seção do Produto */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-          {/* Image */}
+          {/* Imagem */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -125,7 +126,6 @@ export default function Product() {
                   </Badge>
                 </div>
               )}
-              
               <div className="aspect-square flex items-center justify-center">
                 {scanner.image_url ? (
                   <motion.img
@@ -143,34 +143,29 @@ export default function Product() {
             </div>
           </motion.div>
 
-          {/* Product Info */}
+          {/* Informações do Produto */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="space-y-6"
           >
-            {/* Brand */}
             <div>
               <Badge variant="outline" className="bg-[#F2C335]/10 text-[#F2C335] border-[#F2C335]/30 text-sm mb-3">
                 <Tag className="w-3 h-3 mr-1" />
                 {scanner.brand}
               </Badge>
-              <h1 className="text-4xl md:text-5xl font-black text-[#F20505] mb-4">
-                {scanner.model}
-              </h1>
+              <h1 className="text-4xl md:text-5xl font-black text-[#F20505] mb-4">{scanner.model}</h1>
             </div>
 
-            {/* Condition */}
-            <Badge 
-              variant="outline" 
+            <Badge
+              variant="outline"
               className={`${conditionColors[scanner.condition]} text-base px-4 py-2`}
             >
               <Star className="w-4 h-4 mr-2" />
               Estado: {scanner.condition}
             </Badge>
 
-            {/* Price */}
             <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-md">
               {scanner.original_price > scanner.sale_price && (
                 <p className="text-slate-400 text-lg line-through mb-2">
@@ -188,7 +183,7 @@ export default function Product() {
               </p>
             </div>
 
-            {/* CTA Buttons */}
+            {/* Botões de Ação */}
             <div className="space-y-3">
               <motion.button
                 onClick={handlePurchase}
@@ -202,27 +197,25 @@ export default function Product() {
                 }`}
               >
                 {scanner.in_stock ? (
-                  <>
-                    {scanner.purchase_link?.includes('whatsapp') || scanner.purchase_link?.includes('wa.me') ? (
-                      <>
-                        <MessageCircle className="w-5 h-5" />
-                        Comprar via WhatsApp
-                      </>
-                    ) : (
-                      <>
-                        <ShoppingCart className="w-5 h-5" />
-                        Comprar Agora
-                      </>
-                    )}
-                  </>
+                  scanner.purchase_link?.includes('whatsapp') || scanner.purchase_link?.includes('wa.me') ? (
+                    <>
+                      <MessageCircle className="w-5 h-5" />
+                      Comprar via WhatsApp
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-5 h-5" />
+                      Comprar Agora
+                    </>
+                  )
                 ) : (
                   'Produto Esgotado'
                 )}
               </motion.button>
 
               {scanner.in_stock && (
-                <a 
-                  href="https://wa.me/5511999999999?text=Olá! Gostaria de tirar dúvidas sobre um scanner." 
+                <a
+                  href="https://wa.me/5511999999999?text=Olá! Gostaria de tirar dúvidas sobre um scanner."
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -233,55 +226,10 @@ export default function Product() {
                 </a>
               )}
             </div>
-
-            {/* Trust Badges */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
-              {[
-                { icon: Shield, label: "Testado", color: "emerald" },
-                { icon: Truck, label: "Envio 24h", color: "blue" },
-                { icon: BadgeCheck, label: "Garantia", color: "purple" }
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                  className={`bg-slate-50 rounded-xl p-4 flex items-center gap-3 border border-slate-200 shadow-sm`}
-                >
-                  <div className={`w-10 h-10 rounded-lg bg-${item.color}-500/10 flex items-center justify-center`}>
-                    <item.icon className={`w-5 h-5 text-${item.color}-400`} />
-                  </div>
-                  <span className="text-sm font-medium text-slate-700">{item.label}</span>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Features */}
-            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 space-y-3 shadow-md">
-              <h3 className="text-xl font-bold text-[#F20505] mb-4">O que está incluso:</h3>
-              {[
-                "Scanner testado e revisado",
-                "Cabo de alimentação",
-                "Cabo USB",
-                "Garantia de funcionamento",
-                "Suporte técnico especializado"
-              ].map((feature, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 + index * 0.1 }}
-                  className="flex items-center gap-3 text-slate-300"
-                >
-                  <CheckCircle2 className="w-5 h-5 text-[#F2C335] flex-shrink-0" />
-                  <span>{feature}</span>
-                </motion.div>
-              ))}
-            </div>
           </motion.div>
         </div>
 
-        {/* Related Products */}
+        {/* Produtos Relacionados */}
         {relatedScanners.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -293,7 +241,7 @@ export default function Product() {
               Outros scanners <span className="text-[#F2C335]">{scanner.brand}</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedScanners.filter(s => s.id !== scanner.id).slice(0, 4).map((item, index) => (
+              {relatedScanners.map((item, index) => (
                 <motion.div
                   key={item.id}
                   initial={{ opacity: 0, y: 30 }}
@@ -304,7 +252,7 @@ export default function Product() {
                     <div className="bg-white backdrop-blur-xl rounded-2xl p-4 border border-slate-200 hover:border-[#F2C335] transition-all hover:scale-105 shadow-md">
                       <div className="aspect-square bg-slate-50 rounded-xl mb-4 flex items-center justify-center p-4">
                         {item.image_url ? (
-                          <img src={item.image_url} alt={item.model} className="w-full h-full object-contain" />
+                          <img src={item.image_url} alt={item.model} className="w-full h object-contain" />
                         ) : (
                           <Box className="w-20 h-20 text-slate-600" />
                         )}
@@ -321,7 +269,6 @@ export default function Product() {
           </motion.div>
         )}
       </div>
-
       <Footer />
     </div>
   );

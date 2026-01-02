@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
-import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
+
 import Header from '@/components/landing/Header';
 import HeroSection from '@/components/landing/HeroSection';
 import ProductGrid from '@/components/landing/ProductGrid';
@@ -10,7 +12,11 @@ import Footer from '@/components/landing/Footer';
 export default function Home() {
   const { data: scanners = [], isLoading } = useQuery({
     queryKey: ['scanners'],
-    queryFn: () => base44.entities.Scanner.list('-created_date', 100),
+    queryFn: async () => {
+      const res = await fetch('/api/produtos');
+      if (!res.ok) throw new Error('Erro ao buscar scanners');
+      return res.json();
+    },
     initialData: [],
   });
 

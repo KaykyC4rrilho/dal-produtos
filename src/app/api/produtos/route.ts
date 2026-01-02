@@ -1,4 +1,4 @@
-// DAL-PRODUTOS/app/api/produtos/route.ts
+// DAL-PRODUTOS/src/app/api/produtos/route.ts
 import { NextResponse } from 'next/server';
 import { mysqlClient } from '@/lib/Client';
 
