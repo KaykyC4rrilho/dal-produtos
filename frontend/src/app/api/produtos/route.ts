@@ -1,6 +1,6 @@
 // DAL-PRODUTOS/src/app/api/produtos/route.ts
 import { NextResponse } from 'next/server';
-import { mysqlClient } from '@/lib/Client';
+import { mysqlClient } from '../../../lib/Client';
 
 export async function GET() {
   const { data, error } = await mysqlClient.query(`
