@@ -62,9 +62,7 @@ export default function Footer() {
             {/* Social Media */}
             <div className="flex gap-3">
               {[
-                { icon: Instagram, href: "#" },
-                { icon: Facebook, href: "#" },
-                { icon: Linkedin, href: "#" }
+                { icon: Instagram, href: "https://www.instagram.com/dalprodutoseservicos/" },
               ].map((social, index) => (
                 <motion.a
                   key={index}
@@ -135,11 +133,11 @@ export default function Footer() {
             <h4 className="text-white font-bold mb-6">Contato</h4>
             <ul className="space-y-4">
               <li>
-                <a href="tel:+5511999999999" className="flex items-center gap-3 text-slate-400 hover:text-[#F2C335] transition-colors text-sm">
+                <a href="tel:+5521925447173" className="flex items-center gap-3 text-slate-400 hover:text-[#F2C335] transition-colors text-sm">
                   <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center">
                     <Phone className="w-4 h-4" />
                   </div>
-                  <span>(11) 99999-9999</span>
+                  <span>(21) 2544-7173</span>
                 </a>
               </li>
               <li>
@@ -147,12 +145,12 @@ export default function Footer() {
                   <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center">
                     <Mail className="w-4 h-4" />
                   </div>
-                  <span>contato@dalprodutos.com.br</span>
+                  <span>sac@dal.com</span>
                 </a>
               </li>
               <li>
                 <a 
-                  href="https://wa.me/5511999999999" 
+                  href="https://wa.me/552125447173" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-slate-400 hover:text-green-400 transition-colors text-sm"

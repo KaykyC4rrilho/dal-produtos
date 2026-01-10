@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Zap, ShoppingCart, Phone } from 'lucide-react';
+import { Menu, X, Zap } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,16 +19,25 @@ export default function Header() {
   }, []);
 
   const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (location.pathname === '/') {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      navigate('/');
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
     }
     setMobileMenuOpen(false);
   };
 
   return (
     <>
-      {/* Banner de Urgência */}
       <motion.div 
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -42,8 +55,6 @@ export default function Header() {
           <Zap className="w-4 h-4 animate-pulse" />
         </div>
       </motion.div>
-
-      {/* Header Principal */}
       <motion.header
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -56,10 +67,11 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Logo */}
+
             <motion.div 
-              className="flex items-center gap-3"
+              className="flex items-center gap-3 cursor-pointer"
               whileHover={{ scale: 1.02 }}
+              onClick={() => navigate('/')}
             >
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6940678a77918f731aca6e40/c2df3d798_image.png"
@@ -92,23 +104,22 @@ export default function Header() {
                 </motion.button>
               ))}
             </nav>
-
-            {/* CTA Desktop */}
             <motion.a
               href="#vitrine"
-              onClick={(e) => { e.preventDefault(); scrollToSection('vitrine'); }}
+              onClick={(e) => { 
+                e.preventDefault(); 
+                scrollToSection('vitrine'); 
+              }}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="hidden md:flex items-center gap-2 bg-gradient-to-r from-[#F2C335] to-[#F20505] text-white px-5 py-2.5 rounded-full font-semibold shadow-lg shadow-[#F20505]/30 hover:shadow-[#F20505]/50 transition-shadow"
+              className="hidden md:flex items-center gap-2 bg-gradient-to-r from-[#F2C335] to-[#F20505] text-white px-5 py-2.5 rounded-full font-semibold shadow-lg shadow-[#F20505]/30 hover:shadow-[#F20505]/50 transition-shadow cursor-pointer"
             >
-              <Phone className="w-4 h-4" />
+              
               Ver Ofertas
             </motion.a>
-
-            {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 text-[#F20505]"
@@ -118,7 +129,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
