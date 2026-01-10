@@ -1,118 +1,86 @@
 // src/services/api.js
 
-// Ajuste a URL base conforme necessário
+// Ajuste a URL base conforme necessário (ex: variável de ambiente)
 const API_URL = "http://localhost:8000/api";
 
 // Função auxiliar para pegar o token do localStorage
-const getToken = () => localStorage.getItem('token');
-
-// Função auxiliar para criar os headers com autenticação
 const getAuthHeaders = () => {
-  const token = getToken();
+  const token = localStorage.getItem('token');
   return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
 export const api = {
-  // --- AUTENTICAÇÃO (Adicionado para corrigir o erro) ---
+  // --- AUTENTICAÇÃO ---
 
   login: async (email, password) => {
-    // CORREÇÃO: Enviando como JSON para bater com o UserLogin do backend
     const response = await fetch(`${API_URL}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
-        email: email, 
-        password: password 
-      }),
+      body: JSON.stringify({ email, password }),
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || 'Erro ao fazer login');
+      throw new Error(errorData.detail || 'Falha no login');
     }
 
     const data = await response.json();
-    // Salva o token no localStorage
+    // Salva o token no localStorage para usar depois
     if (data.access_token) {
       localStorage.setItem('token', data.access_token);
     }
     return data;
   },
 
-  isAuthenticated: () => {
-    // Verifica se existe um token salvo
-    return !!localStorage.getItem('token');
+  logout: () => {
+    localStorage.removeItem('token');
   },
 
-  logout: () => {
-    // Remove o token para deslogar
-    localStorage.removeItem('token');
-    // Opcional: Redirecionar para login via window.location ou deixar o React lidar com isso
-    window.location.href = '/login';
+  isAuthenticated: () => {
+    return !!localStorage.getItem('token');
   },
 
   // --- MÉTODOS DE LEITURA (GET) ---
 
-  getScanners: async ({
-    brand = null,
-    minPrice = null,
-    maxPrice = null,
-    search = null,
-    in_stock = null,
-    page = 1,
-    limit = 12
-  } = {}) => {
-    const params = new URLSearchParams();
+  getScanners: async (params = {}) => {
+    // Converte o objeto params em query string (ex: ?limit=10&search=algo)
+    const queryParams = new URLSearchParams();
 
-    if (brand && brand !== "all") params.append("brand", brand);
-    if (minPrice && minPrice !== "all") params.append("min_price", minPrice);
-    if (maxPrice && maxPrice !== "all") params.append("max_price", maxPrice);
-    if (search) params.append("search", search);
+    if (params.skip) queryParams.append('skip', params.skip);
+    if (params.limit) queryParams.append('limit', params.limit);
+    if (params.search) queryParams.append('search', params.search);
+    if (params.brand) queryParams.append('brand', params.brand);
 
-    // Se in_stock for passado (true ou false), envia para o backend.
-    if (in_stock !== null && in_stock !== undefined) {
-        params.append("in_stock", in_stock);
+    // Novo parâmetro para excluir um ID específico (usado nos "Relacionados")
+    if (params.exclude_id) queryParams.append('exclude_id', params.exclude_id);
+
+    const response = await fetch(`${API_URL}/scanners?${queryParams.toString()}`);
+    if (!response.ok) {
+      throw new Error('Erro ao buscar scanners');
     }
-
-    params.append("page", page);
-    params.append("limit", limit);
-
-    const response = await fetch(`${API_URL}/scanners?${params.toString()}`);
-    if (!response.ok) throw new Error('Erro ao buscar scanners');
     return response.json();
   },
 
   getScannerById: async (id) => {
     const response = await fetch(`${API_URL}/scanners/${id}`);
-    if (!response.ok) throw new Error('Erro ao buscar detalhes do scanner');
+    if (!response.ok) {
+      throw new Error('Scanner não encontrado');
+    }
     return response.json();
   },
 
-  getBrands: async () => {
-    const response = await fetch(`${API_URL}/scanners/brands/all`);
-    if (!response.ok) throw new Error('Erro ao buscar marcas');
-    return response.json();
-  },
+  // --- MÉTODOS DE ESCRITA (PROTEGIDOS) ---
 
-  getPriceRanges: async () => {
-    const response = await fetch(`${API_URL}/scanners/filters/price-ranges`);
-    if (!response.ok) throw new Error('Erro ao buscar faixas de preço');
-    return response.json();
-  },
-
-  // --- MÉTODOS DE ESCRITA (CRUD) ---
-  // Agora enviamos o token nos headers para garantir permissão
-
-  createScanner: async (data) => {
+  createScanner: async (scannerData) => {
     const response = await fetch(`${API_URL}/scanners`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...getAuthHeaders(), // Envia token
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(scannerData),
     });
 
     if (!response.ok) {
@@ -122,14 +90,14 @@ export const api = {
     return response.json();
   },
 
-  updateScanner: async (id, data) => {
+  updateScanner: async (id, scannerData) => {
     const response = await fetch(`${API_URL}/scanners/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         ...getAuthHeaders(), // Envia token
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(scannerData),
     });
 
     if (!response.ok) {
@@ -160,6 +128,7 @@ export const api = {
     const response = await fetch(`${API_URL}/upload`, {
       method: 'POST',
       headers: {
+        // Nota: Não definimos Content-Type para FormData manualmente, o navegador faz isso.
         ...getAuthHeaders(), // Envia token
       },
       body: formData,

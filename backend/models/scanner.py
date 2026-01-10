@@ -11,7 +11,7 @@ class Scanner(Base):
     item_condition = Column(String(50), nullable=False)
     original_price = Column(DECIMAL(10, 2), nullable=False)
     sale_price = Column(DECIMAL(10, 2), nullable=False)
-    image_url = Column(Text)
+    image_url = Column(Text, nullable=True)
     purchase_link = Column(Text)
     in_stock = Column(Boolean, default=True)
     created_date = Column(DateTime(timezone=True), server_default=func.now())

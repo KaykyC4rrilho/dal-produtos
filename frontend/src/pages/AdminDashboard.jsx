@@ -74,7 +74,7 @@ export default function AdminProducts() {
   };
 
   const [formData, setFormData] = useState(initialFormState);
-  const DEFAULT_WHATSAPP = "https://wa.me/5521999999999?text=Olá,%20tenho%20interesse%20no%20produto"; 
+  const DEFAULT_WHATSAPP = "https://wa.me/552125447173?text=Olá,%20tenho%20interesse%20no%20produto"; 
 
   const fetchScanners = async () => {
     setIsLoading(true);

@@ -1,7 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query, Depends, File, UploadFile, Request
-import shutil
-import os
-import uuid
+import base64
 from typing import Optional, List
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_
@@ -10,7 +8,6 @@ from database import get_db
 from decimal import Decimal
 from pydantic import BaseModel
 from datetime import datetime
-
 # IMPORTANTE: Importa a verificação de usuário do auth.py
 from routers.auth import get_current_user
 import models.user as user_model
@@ -18,13 +15,14 @@ import models.user as user_model
 router = APIRouter(prefix="/api", tags=["products"])
 
 # --- Schemas Pydantic para Validação ---
+
 class ScannerBase(BaseModel):
     model: str
     brand: str
     item_condition: str
     original_price: Optional[float] = None
     sale_price: Optional[float] = None
-    image_url: Optional[str] = None
+    image_url: Optional[str] = None # Receberá a string Base64 (Requer coluna TEXT/LONGTEXT no banco)
     purchase_link: Optional[str] = None
     in_stock: bool = True
 
@@ -36,7 +34,8 @@ class ScannerUpdate(ScannerBase):
 
 class ScannerResponse(ScannerBase):
     id: int
-    created_at: datetime
+    # created_at: datetime  <-- SE TIVER ISSO, COMENTE OU MUDE PARA:
+    created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -66,48 +65,36 @@ def get_price_ranges(db: Session = Depends(get_db)):
 
 @router.get("/scanners")
 def get_scanners(
-    brand: Optional[str] = None,
-    min_price: Optional[float] = None,
-    max_price: Optional[float] = None,
+    skip: int = 0,
+    limit: int = 10,
     search: Optional[str] = None,
-    page: int = 1,
-    limit: int = 12,
+    brand: Optional[str] = None,
+    exclude_id: Optional[int] = None, # <--- NOVO PARÂMETRO
     db: Session = Depends(get_db)
 ):
     query = db.query(scanner_model.Scanner)
 
-    # Filtros
-    if brand and brand.lower() != "all":
-        query = query.filter(scanner_model.Scanner.brand == brand)
-
-    if min_price is not None:
-        query = query.filter(scanner_model.Scanner.sale_price >= min_price)
-
-    if max_price is not None:
-        query = query.filter(scanner_model.Scanner.sale_price <= max_price)
-
     if search:
-        search_term = f"%{search}%"
+        search_filter = f"%{search}%"
         query = query.filter(
             or_(
-                scanner_model.Scanner.model.ilike(search_term),
-                scanner_model.Scanner.brand.ilike(search_term)
+                scanner_model.Scanner.model.ilike(search_filter),
+                scanner_model.Scanner.brand.ilike(search_filter)
             )
         )
 
-    # Paginação
+    if brand:
+        query = query.filter(scanner_model.Scanner.brand == brand)
+
+    # --- NOVO FILTRO ---
+    if exclude_id:
+        query = query.filter(scanner_model.Scanner.id != exclude_id)
+    # -------------------
+
     total = query.count()
-    scanners = query.offset((page - 1) * limit).limit(limit).all()
+    scanners = query.offset(skip).limit(limit).all()
 
-    return {
-        "scanners": scanners,
-        "total": total,
-        "page": page,
-        "pages": (total + limit - 1) // limit
-    }
-
-# --- Rotas Protegidas (Apenas Admin Logado) ---
-# Adicionamos: current_user: user_model.User = Depends(get_current_user)
+    return {"total": total, "scanners": scanners}
 
 @router.post("/scanners", response_model=ScannerResponse)
 def create_scanner(
@@ -163,14 +150,17 @@ def delete_scanner(
     """Deletar um scanner (Requer Login)"""
     try:
         db_scanner = db.query(scanner_model.Scanner).filter(scanner_model.Scanner.id == scanner_id).first()
+
+        # ALTERAÇÃO AQUI:
+        # Se não encontrar o scanner, assumimos que ele já foi deletado (provavelmente pelo duplo clique)
+        # e retornamos sucesso (200) ao invés de erro (404).
         if not db_scanner:
-            raise HTTPException(status_code=404, detail="Scanner não encontrado")
+            return {"message": "Scanner deletado (ou não existia)"}
 
         db.delete(db_scanner)
         db.commit()
         return {"message": "Scanner deletado com sucesso"}
-    except HTTPException:
-        raise
+
     except Exception as e:
         db.rollback()
         print(f"Erro ao deletar scanner: {str(e)}")
@@ -178,26 +168,26 @@ def delete_scanner(
 
 @router.post("/upload")
 async def upload_image(
-    request: Request,
     file: UploadFile = File(...),
     current_user: user_model.User = Depends(get_current_user) # <--- PROTEGIDO
 ):
-    """Faz upload de uma imagem (Requer Login)"""
+    """
+    Faz upload de uma imagem convertendo para Base64.
+    Retorna a string Base64 pronta para ser salva no banco.
+    """
     try:
-        UPLOAD_DIR = "uploads"
-        if not os.path.exists(UPLOAD_DIR):
-            os.makedirs(UPLOAD_DIR)
+        # Lê o arquivo em memória
+        contents = await file.read()
 
-        file_extension = os.path.splitext(file.filename)[1]
-        new_filename = f"{uuid.uuid4()}{file_extension}"
-        file_path = os.path.join(UPLOAD_DIR, new_filename)
+        # Converte para Base64
+        encoded_string = base64.b64encode(contents).decode("utf-8")
 
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+        # Cria o Data URI (ex: data:image/jpeg;base64,...)
+        base64_url = f"data:{file.content_type};base64,{encoded_string}"
 
-        # Pega a URL base automaticamente
-        base_url = str(request.base_url).rstrip("/")
-        return {"url": f"{base_url}/uploads/{new_filename}"}
+        # Retorna com a chave "url" para manter compatibilidade com o frontend
+        return {"url": base64_url}
+
     except Exception as e:
-        print(f"Erro no upload: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Erro ao fazer upload: {str(e)}")
+        print(f"Erro no upload (Base64): {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro ao processar imagem: {str(e)}")
