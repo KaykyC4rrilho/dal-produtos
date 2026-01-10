@@ -1,14 +1,12 @@
-from fastapi import APIRouter, HTTPException, Query, Depends, File, UploadFile, Request
+from fastapi import APIRouter, HTTPException, Depends, File, UploadFile
 import base64
-from typing import Optional, List
+from typing import Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_
 import models.scanner as scanner_model
 from database import get_db
-from decimal import Decimal
 from pydantic import BaseModel
 from datetime import datetime
-# IMPORTANTE: Importa a verificação de usuário do auth.py
 from routers.auth import get_current_user
 import models.user as user_model
 
