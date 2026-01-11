@@ -1,7 +1,7 @@
 // src/services/api.js
 
 // Ajuste a URL base conforme necessário (ex: variável de ambiente)
-const API_URL = "http://localhost:8000/api";
+const API_URL = "https://dal-produtos.vercel.app/api";
 
 // Função auxiliar para pegar o token do localStorage
 const getAuthHeaders = () => {
