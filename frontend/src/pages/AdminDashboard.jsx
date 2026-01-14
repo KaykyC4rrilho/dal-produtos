@@ -74,7 +74,7 @@ export default function AdminProducts() {
   };
 
   const [formData, setFormData] = useState(initialFormState);
-  const DEFAULT_WHATSAPP = "https://wa.me/552125447173?text=Olá,%20tenho%20interesse%20no%20produto"; 
+  const DEFAULT_WHATSAPP = "https://wa.me/552139044399?text=Olá,%20tenho%20interesse%20no%20produto"; 
 
   const fetchScanners = async () => {
     setIsLoading(true);
@@ -181,7 +181,7 @@ export default function AdminProducts() {
       const linkValue = dataToSubmit.purchase_link ? String(dataToSubmit.purchase_link) : "";
 
       if (!dataToSubmit.purchase_link || linkValue.trim() === "") {
-        const seuNumero = "552125447173"; 
+        const seuNumero = "552139044399"; 
         const mensagem = encodeURIComponent("Olá, vi um scanner no site e tenho interesse!");
         dataToSubmit.purchase_link = `https://wa.me/${seuNumero}?text=${mensagem}`;
       }
@@ -478,10 +478,8 @@ export default function AdminProducts() {
                         onChange={handleInputChange} 
                         options={[
                           { value: "", label: "Selecione..." },
-                          { value: "iTero", label: "iTero" },
-                          { value: "3Shape", label: "3Shape" },
-                          { value: "Medit", label: "Medit" },
-                          { value: "Sirona", label: "Sirona" },
+                          { value: "Fujitsu", label: "Fujitsu" },
+                          { value: "Brother", label: "Brother" },
                           { value: "Outros", label: "Outros" }
                         ]}
                         required

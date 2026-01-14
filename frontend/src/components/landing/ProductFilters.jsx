@@ -97,6 +97,7 @@ const CustomSelect = ({ value, onValueChange, icon: Icon, placeholder, options }
 // Componente de botão para ProductFilters
 const FilterButton = ({ children, onClick, variant = 'outline', className = '' }) => {
   const baseClasses = 'font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 px-4 py-2 flex items-center';
+
   const variantClasses = {
     default: 'bg-gradient-to-r from-[#F2C335] to-[#F20505] text-white hover:from-[#F2C335]/90 hover:to-[#F20505]/90',
     outline: 'border border-slate-600/50 text-slate-300 hover:bg-slate-700',
@@ -130,10 +131,15 @@ export default function ProductFilters({
     setPriceRange("all");
   };
 
-  // Preparar opções para os selects
+  const manualBrands = ["Fujitsu", "Brother"];
+
+  const apiBrands = brands.filter(b => !manualBrands.includes(b));
+
+  const allBrands = [...manualBrands, ...apiBrands];
+
   const brandOptions = [
     { label: "Todas as Marcas", value: "all" },
-    ...brands.map(brand => ({ label: brand, value: brand }))
+    ...allBrands.map(brand => ({ label: brand, value: brand }))
   ];
 
   const priceOptions = PRICE_RANGES;
@@ -217,6 +223,7 @@ export default function ProductFilters({
                 </button>
               </span>
             )}
+
             {selectedBrand !== "all" && (
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/30">
                 Marca: {selectedBrand}
@@ -228,6 +235,7 @@ export default function ProductFilters({
                 </button>
               </span>
             )}
+
             {priceRange !== "all" && (
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/30">
                 Preço: {PRICE_RANGES.find(r => r.value === priceRange)?.label}

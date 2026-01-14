@@ -133,7 +133,7 @@ export default function Footer() {
             <h4 className="text-white font-bold mb-6">Contato</h4>
             <ul className="space-y-4">
               <li>
-                <a href="tel:+5521925447173" className="flex items-center gap-3 text-slate-400 hover:text-[#F2C335] transition-colors text-sm">
+                <a href="tel:+552139044399" className="flex items-center gap-3 text-slate-400 hover:text-[#F2C335] transition-colors text-sm">
                   <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center">
                     <Phone className="w-4 h-4" />
                   </div>
@@ -150,7 +150,7 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://wa.me/552125447173" 
+                  href="https://wa.me/552139044399?text=Olá! Vi o site de vocês e gostaria de mais informações sobre os scanners." 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-slate-400 hover:text-green-400 transition-colors text-sm"
@@ -180,7 +180,7 @@ export default function Footer() {
 
       {/* Floating WhatsApp Button */}
       <motion.a
-        href="https://wa.me/5511999999999?text=Olá! Vi o site de vocês e gostaria de mais informações sobre os scanners."
+        href="https://wa.me/552139044399?text=Olá! Vi o site de vocês e gostaria de mais informações sobre os scanners."
         target="_blank"
         rel="noopener noreferrer"
         initial={{ scale: 0 }}

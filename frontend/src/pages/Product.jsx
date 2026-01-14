@@ -229,7 +229,7 @@ export default function Product() {
                 </button>
 
                 <button 
-                  onClick={() => window.open(`https://wa.me/552125447173?text=Tenho dúvida sobre o ${scanner.model}`, '_blank')}
+                  onClick={() => window.open(`https://wa.me/552139044399?text=Tenho dúvida sobre o ${scanner.model}`, '_blank')}
                   className="px-6 py-4 rounded-xl bg-slate-800 text-white font-bold hover:bg-slate-700 border border-slate-700 transition-all flex items-center justify-center gap-2"
                 >
                   <MessageCircle className="w-6 h-6" />
