@@ -178,17 +178,6 @@ export default function ProductFilters({
             />
           </div>
 
-          {/* Price Filter */}
-          <div className="w-full sm:w-[200px]">
-            <CustomSelect
-              value={priceRange}
-              onValueChange={setPriceRange}
-              icon={SlidersHorizontal}
-              placeholder="Faixa de Preço"
-              options={priceOptions}
-            />
-          </div>
-
           {/* Clear Filters */}
           {hasActiveFilters && (
             <motion.div
