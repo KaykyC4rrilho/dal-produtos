@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   ShoppingCart, 
   Mail, 
@@ -14,18 +15,34 @@ import {
 } from 'lucide-react';
 
 export default function Footer() {
+  const location = useLocation(); 
+  const navigate = useNavigate(); 
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const scrollToSection = (id) => {
+    if (location.pathname === '/') {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      navigate('/');
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
   };
 
   const currentYear = new Date().getFullYear();
 
   return (
     <footer id="footer" className="bg-slate-950 relative overflow-hidden">
-      {/* Top Border Gradient */}
       <div className="h-1 bg-gradient-to-r from-[#F2C335] via-[#F20505] to-[#F2C335]" />
-
-      {/* Back to Top Button */}
       <motion.button
         onClick={scrollToTop}
         whileHover={{ scale: 1.1, y: -5 }}
@@ -37,7 +54,6 @@ export default function Footer() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-          {/* Brand Column */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -59,7 +75,6 @@ export default function Footer() {
               Especialistas em scanners profissionais revisados. 
               Qualidade garantida com os melhores preços do mercado.
             </p>
-            {/* Social Media */}
             <div className="flex gap-3">
               {[
                 { icon: Instagram, href: "https://www.instagram.com/dalprodutoseservicos/" },
@@ -75,8 +90,6 @@ export default function Footer() {
               ))}
             </div>
           </motion.div>
-
-          {/* Links Rápidos */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -89,15 +102,11 @@ export default function Footer() {
                 { label: "Home", id: "hero" },
                 { label: "Estoque", id: "vitrine" },
                 { label: "Sobre Nós", id: "footer" },
-                { label: "Contato", id: "footer" }
               ].map((link, index) => (
                 <li key={index}>
                   <button
-                    onClick={() => {
-                      const el = document.getElementById(link.id);
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="text-slate-400 hover:text-[#F2C335] transition-colors text-sm"
+                    onClick={() => scrollToSection(link.id)} // Usando a nova função
+                    className="text-slate-400 hover:text-[#F2C335] transition-colors text-sm text-left"
                   >
                     {link.label}
                   </button>
@@ -105,8 +114,6 @@ export default function Footer() {
               ))}
             </ul>
           </motion.div>
-
-          {/* Marcas */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -115,15 +122,13 @@ export default function Footer() {
           >
             <h4 className="text-white font-bold mb-6">Marcas</h4>
             <ul className="space-y-3">
-              {["Canon", "Fujitsu", "Kodak", "Epson", "HP", "Brother"].map((brand, index) => (
+              {[ "Fujitsu", "Brother"].map((brand, index) => (
                 <li key={index}>
                   <span className="text-slate-400 text-sm">{brand}</span>
                 </li>
               ))}
             </ul>
           </motion.div>
-
-          {/* Contato */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -137,11 +142,11 @@ export default function Footer() {
                   <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center">
                     <Phone className="w-4 h-4" />
                   </div>
-                  <span>(21) 2544-7173</span>
+                  <span>(21) 3904-4399</span>
                 </a>
               </li>
               <li>
-                <a href="mailto:contato@dalprodutos.com.br" className="flex items-center gap-3 text-slate-400 hover:text-[#F2C335] transition-colors text-sm">
+                <a href="mailto:sac@dal.comr" className="flex items-center gap-3 text-slate-400 hover:text-[#F2C335] transition-colors text-sm">
                   <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center">
                     <Mail className="w-4 h-4" />
                   </div>
@@ -164,8 +169,6 @@ export default function Footer() {
             </ul>
           </motion.div>
         </div>
-
-        {/* Bottom Bar */}
         <div className="border-t border-slate-800 pt-8 mt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-slate-500 text-sm text-center md:text-left">
@@ -177,8 +180,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-
-      {/* Floating WhatsApp Button */}
       <motion.a
         href="https://wa.me/552139044399?text=Olá! Vi o site de vocês e gostaria de mais informações sobre os scanners."
         target="_blank"

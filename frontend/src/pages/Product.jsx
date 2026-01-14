@@ -244,7 +244,7 @@ export default function Product() {
                 Incluso na caixa
               </h3>
               <ul className="grid grid-cols-2 gap-3">
-                {['Cabo de Força', 'Cabo USB', 'Fonte de Alimentação', 'Garantia 3 Meses'].map((item, i) => (
+                {['Cabo de Força', 'Cabo USB', 'Fonte de Alimentação'].map((item, i) => (
                   <li key={i} className="flex items-center gap-2 text-slate-300 text-sm">
                     <CheckCircle2 className="w-4 h-4 text-[#F2C335]" />
                     {item}
