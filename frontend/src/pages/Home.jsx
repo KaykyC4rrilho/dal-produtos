@@ -1,8 +1,5 @@
-'use client';
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-
 import Header from '@/components/landing/Header';
 import HeroSection from '@/components/landing/HeroSection';
 import ProductGrid from '@/components/landing/ProductGrid';
