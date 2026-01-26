@@ -1,11 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { 
-  ShoppingCart, 
-  Mail, 
-  Phone, 
-  MapPin, 
+import {
+  ShoppingCart,
+  Mail,
+  Phone,
+  MapPin,
   MessageCircle,
   ArrowUp,
   Heart,
@@ -15,8 +15,8 @@ import {
 } from 'lucide-react';
 
 export default function Footer() {
-  const location = useLocation(); 
-  const navigate = useNavigate(); 
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -32,7 +32,7 @@ export default function Footer() {
       setTimeout(() => {
         const element = document.getElementById(id);
         if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
+          element.scrollIntoView({ behavior: 'smooth' });
         }
       }, 100);
     }
@@ -61,7 +61,7 @@ export default function Footer() {
             transition={{ duration: 0.5 }}
           >
             <div className="flex items-center gap-3 mb-6">
-              <img 
+              <img
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6940678a77918f731aca6e40/c2df3d798_image.png"
                 alt="Dal Produtos"
                 className="w-12 h-12 object-contain"
@@ -72,23 +72,20 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed mb-6">
-              Especialistas em scanners profissionais revisados. 
+              Especialistas em scanners profissionais revisados.
               Qualidade garantida com os melhores preços do mercado.
             </p>
-            <div className="flex gap-3">
-              {[
-                { icon: Instagram, href: "https://www.instagram.com/dalprodutoseservicos/" },
-              ].map((social, index) => (
-                <motion.a
-                  key={index}
-                  href={social.href}
-                  whileHover={{ scale: 1.1, y: -3 }}
-                  className="w-10 h-10 bg-slate-800 hover:bg-slate-700 rounded-xl flex items-center justify-center text-slate-400 hover:text-white transition-colors"
-                >
-                  <social.icon className="w-5 h-5" />
-                </motion.a>
-              ))}
+            <div className="flex flex-col gap-2">
+              <p className="text-slate-400 text-xs font-mono">
+                CNPJ: 08.694.231/0001-54
+              </p>
+              <div className="flex gap-3">
+                <a href="https://www.instagram.com/dalprodutoseservicos/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-pink-500">
+                  <Instagram className="w-5 h-5" />
+                </a>
+              </div>
             </div>
+
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -120,15 +117,26 @@ export default function Footer() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h4 className="text-white font-bold mb-6">Marcas</h4>
-            <ul className="space-y-3">
-              {[ "Fujitsu", "Brother"].map((brand, index) => (
-                <li key={index}>
-                  <span className="text-slate-400 text-sm">{brand}</span>
-                </li>
-              ))}
+            <h4 className="text-white font-bold mb-6">Institucional</h4>
+            <ul className="space-y-3 text-sm text-slate-400">
+              <li>
+                <a href="/politica-de-privacidade" className="hover:text-[#F2C335] transition-colors">
+                  Política de Privacidade
+                </a>
+              </li>
+              <li>
+                <a href="/termos-de-uso" className="hover:text-[#F2C335] transition-colors">
+                  Termos de Uso
+                </a>
+              </li>
+              <li>
+                <a href="/politica-de-garantia" className="hover:text-[#F2C335] transition-colors">
+                  Política de Garantia
+                </a>
+              </li>
             </ul>
           </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -154,9 +162,9 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a 
-                  href="https://wa.me/552139044399?text=Olá! Vi o site de vocês e gostaria de mais informações sobre os scanners." 
-                  target="_blank" 
+                <a
+                  href="https://wa.me/552139044399?text=Olá! Vi o site de vocês e gostaria de mais informações sobre os scanners."
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-slate-400 hover:text-green-400 transition-colors text-sm"
                 >
@@ -175,7 +183,15 @@ export default function Footer() {
               © {currentYear} Dal Produtos. Todos os direitos reservados.
             </p>
             <p className="text-slate-500 text-sm flex items-center gap-1">
-              Feito com <Heart className="w-4 h-4 text-red-500 fill-red-500" /> no Brasil
+              Feito com <Heart className="w-4 h-4 text-red-500 fill-red-500" /> por
+              <a
+                href="https://kaykycarrilho.online"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#F2C335] hover:text-[#F20505] transition-colors font-medium ml-1"
+              >
+                Kayky Carrilho
+              </a>
             </p>
           </div>
         </div>

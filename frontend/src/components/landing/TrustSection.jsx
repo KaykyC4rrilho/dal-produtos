@@ -224,10 +224,10 @@ export default function TrustSection() {
           className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6"
         >
           {[
-            { number: "500+", label: "Scanners vendidos" },
+            { number: "2000+", label: "Scanners vendidos" },
             { number: "98%", label: "Clientes satisfeitos" },
             { number: "24h", label: "Tempo de envio" },
-            { number: "10+", label: "Anos de experiência" }
+            { number: "15+", label: "Anos de experiência" }
           ].map((stat, index) => (
             <motion.div
               key={index}

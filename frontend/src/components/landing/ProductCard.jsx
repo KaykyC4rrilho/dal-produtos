@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingCart, MessageCircle, Star, Box, AlertTriangle } from 'lucide-react';
+import {
+  ShoppingCart,
+  MessageCircle,
+  Star,
+  Box,
+  AlertTriangle,
+  Flame,
+} from 'lucide-react';
 
 const conditionColors = {
   "Excelente": "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30",
@@ -11,7 +18,6 @@ const conditionColors = {
   "Usado": "bg-orange-500/10 text-orange-400 border border-orange-500/30"
 };
 
-// Componente de badge customizado
 const Badge = ({ children, variant = 'default', className = '', ...props }) => {
   const variantClasses = {
     default: 'bg-blue-100 text-blue-800',
@@ -33,19 +39,16 @@ export default function ProductCard({ scanner, index }) {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  // Calcular desconto
   const discount = scanner.original_price && scanner.sale_price
     ? Math.round(((scanner.original_price - scanner.sale_price) / scanner.original_price) * 100)
     : 0;
 
   const handlePurchase = (e) => {
     e.stopPropagation();
-
     if (!scanner.purchase_link) {
       alert('Link de compra não disponível');
       return;
     }
-
     if (scanner.purchase_link.includes('whatsapp') || scanner.purchase_link.includes('wa.me')) {
       const message = encodeURIComponent(`Olá, tenho interesse no scanner ${scanner.model} da marca ${scanner.brand} que vi no site.`);
       const whatsappUrl = scanner.purchase_link.includes('?')
@@ -67,18 +70,18 @@ export default function ProductCard({ scanner, index }) {
 
   return (
     <motion.div
-      layout // Importante: ajuda o Framer a entender mudanças de posição na lista
+      layout
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }} // Força a animação ao montar
+      animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{
         duration: 0.4,
-        delay: index * 0.05, // Delay menor para evitar sensação de lentidão
+        delay: index * 0.05,
         ease: "easeOut"
       }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className="group relative cursor-pointer h-full"
+      className="group relative cursor-pointer h-full flex flex-col"
       style={{ perspective: '1000px' }}
       onClick={handleCardClick}
     >
@@ -89,10 +92,10 @@ export default function ProductCard({ scanner, index }) {
           y: isHovered ? -5 : 0,
         }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="relative bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl overflow-hidden border border-slate-700/50 shadow-xl h-full flex flex-col"
+        className="relative bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl overflow-hidden border border-slate-700/50 shadow-xl h-full flex flex-col flex-1"
         style={{ transformStyle: 'preserve-3d' }}
       >
-        {/* Discount Badge */}
+        {/* Badge de desconto */}
         {discount > 0 && (
           <div className="absolute top-4 left-4 z-20">
             <motion.div
@@ -105,17 +108,21 @@ export default function ProductCard({ scanner, index }) {
           </div>
         )}
 
-        {/* Stock Badge */}
-        {!inStock && (
-          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm z-30 flex items-center justify-center rounded-2xl">
-            <div className="bg-slate-700 text-slate-300 text-lg px-4 py-2 rounded-full flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4" />
-              Esgotado
-            </div>
+        {/* Gatilho de escassez */}
+        {inStock && scanner.in_stock <= 3 && (
+          <div className="absolute top-4 right-4 z-20">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="bg-red-100 text-red-700 px-3 py-1.5 rounded-full text-xs font-bold shadow-md flex items-center gap-1"
+            >
+              <Flame className="w-4 h-4" />
+              Últimas unidades
+            </motion.div>
           </div>
         )}
 
-        {/* Image Container */}
+        {/* Imagem */}
         <div className="relative h-48 sm:h-56 overflow-hidden bg-gradient-to-br from-slate-700/30 to-slate-800/30 shrink-0">
           <motion.div
             animate={{ scale: isHovered ? 1.05 : 1 }}
@@ -139,21 +146,12 @@ export default function ProductCard({ scanner, index }) {
               </div>
             )}
           </motion.div>
-
-          {/* Shine Effect */}
-          <motion.div
-            animate={{
-              x: isHovered ? ['-100%', '200%'] : '-100%',
-            }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12"
-          />
         </div>
 
-        {/* Content */}
-        <div className="p-5 space-y-4 flex flex-col flex-1">
-          {/* Brand & Model */}
-          <div>
+        {/* Conteúdo */}
+        <div className="p-5 flex flex-col flex-1">
+          {/* Título e disponibilidade */}
+          <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
               <p className="text-[#F2C335] text-xs font-semibold tracking-wider uppercase">
                 {scanner.brand || "Marca não informada"}
@@ -164,31 +162,37 @@ export default function ProductCard({ scanner, index }) {
                 </Badge>
               )}
             </div>
-            <h3 className="text-[#F20505] font-bold text-lg leading-tight line-clamp-2 group-hover:text-[#F2C335] transition-colors min-h-[3.5rem]">
+            <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 group-hover:text-[#F2C335] transition-colors min-h-[3.5rem] mb-2">
               {scanner.model || "Modelo não informado"}
             </h3>
+            {/* Gatilho de benefício */}
+            <p className="text-xs text-slate-400">
+              Revisado com garantia de funcionamento
+            </p>
           </div>
 
-          {/* Condition Badge */}
-          {scanner.condition && (
-            <div
-              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium w-fit ${conditionColors[scanner.condition] || conditionColors["Bom"]}`}
-            >
-              <Star className="w-3 h-3 mr-1" />
-              {scanner.condition}
-            </div>
-          )}
+          {/* Condição - agora em posição absoluta relativa */}
+          <div className="mb-4">
+            {scanner.condition && (
+              <div
+                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium w-fit ${conditionColors[scanner.condition] || conditionColors["Bom"]}`}
+              >
+                <Star className="w-3 h-3 mr-1" />
+                {scanner.condition}
+              </div>
+            )}
+          </div>
 
-          {/* Price Section - Pushes button to bottom */}
-          <div className="space-y-1 mt-auto pt-2">
+          {/* Preço - posicionado sempre no final antes do botão */}
+          <div className="mt-auto pt-4 space-y-1">
             {originalPrice > salePrice && salePrice > 0 && (
               <p className="text-slate-500 text-sm line-through">
-                De R$ {originalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                De R$ {originalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </p>
             )}
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-black text-white">
-                R$ {salePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                R$ {salePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </span>
               <span className="text-xs text-slate-500">à vista</span>
             </div>
@@ -197,13 +201,13 @@ export default function ProductCard({ scanner, index }) {
             )}
           </div>
 
-          {/* CTA Button */}
+          {/* Botão de compra - sempre alinhado no fundo */}
           <motion.button
             onClick={handlePurchase}
             disabled={!inStock || !scanner.purchase_link}
             whileHover={{ scale: (inStock && scanner.purchase_link) ? 1.02 : 1 }}
             whileTap={{ scale: (inStock && scanner.purchase_link) ? 0.98 : 1 }}
-            className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all mt-2 ${
+            className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all mt-4 ${
               inStock && scanner.purchase_link
                 ? 'bg-gradient-to-r from-[#F2C335] to-[#F20505] text-white shadow-lg shadow-[#F20505]/30 hover:shadow-[#F20505]/50 cursor-pointer'
                 : 'bg-slate-700 text-slate-400 cursor-not-allowed'
@@ -214,7 +218,7 @@ export default function ProductCard({ scanner, index }) {
                 <AlertTriangle className="w-4 h-4" />
                 Indisponível
               </>
-            ) : scanner.purchase_link.includes('whatsapp') || scanner.purchase_link.includes('wa.me') ? (
+            ) : scanner.purchase_link.includes('whatsapp') ? (
               <>
                 <MessageCircle className="w-4 h-4" />
                 Comprar via WhatsApp
@@ -228,11 +232,9 @@ export default function ProductCard({ scanner, index }) {
           </motion.button>
         </div>
 
-        {/* 3D Border Effect */}
+        {/* Efeito 3D */}
         <motion.div
-          animate={{
-            opacity: isHovered ? 1 : 0,
-          }}
+          animate={{ opacity: isHovered ? 1 : 0 }}
           className="absolute inset-0 rounded-2xl border-2 border-[#F2C335]/50 pointer-events-none"
         />
       </motion.div>
