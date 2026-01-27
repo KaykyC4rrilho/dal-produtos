@@ -213,6 +213,7 @@ export default function Product() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={handlePurchase}
+                  data-testid="buy-now-button"
                   disabled={!scanner.in_stock}
                   className="flex-1 py-4 px-8 rounded-xl bg-[#F2C335] text-slate-950 font-black text-lg hover:bg-[#F2C335]/90 transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_-5px_#F2C335]"
                 >

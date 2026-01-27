@@ -204,6 +204,7 @@ export default function ProductCard({ scanner, index }) {
           {/* Botão de compra - sempre alinhado no fundo */}
           <motion.button
             onClick={handlePurchase}
+            data-testid="buy-now-button"
             disabled={!inStock || !scanner.purchase_link}
             whileHover={{ scale: (inStock && scanner.purchase_link) ? 1.02 : 1 }}
             whileTap={{ scale: (inStock && scanner.purchase_link) ? 0.98 : 1 }}
