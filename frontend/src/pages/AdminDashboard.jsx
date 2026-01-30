@@ -7,6 +7,8 @@ import {
   LogOut, AlertTriangle 
 } from 'lucide-react';
 import { api } from '@/services/api';
+import { Helmet } from 'react-helmet-async';
+
 
 // Componentes de Formulário (Mantidos iguais)
 const FormInput = ({ label, name, value, onChange, type = "text", required = false, placeholder = "" }) => (
@@ -207,6 +209,12 @@ export default function AdminProducts() {
   };
 
   return (
+    <>
+    {/* 🚫 Área administrativa — NÃO indexar */}
+    <Helmet>
+      <title>Administração | Dal Produtos</title>
+      <meta name="robots" content="noindex, nofollow" />
+    </Helmet>
     <div className="min-h-screen bg-slate-900 text-slate-100 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -578,5 +586,6 @@ export default function AdminProducts() {
         </AnimatePresence>
       </div>
     </div>
+    </>
   );
 }

@@ -1,7 +1,14 @@
 // src/services/api.js
 
 // Ajuste a URL base conforme necessário (ex: variável de ambiente)
-const API_URL = "https://dal-produtos.vercel.app/api";
+// src/services/api.js
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+if (!API_URL) {
+  throw new Error('VITE_API_URL não definida no .env');
+}
+
 
 // Função auxiliar para pegar o token do localStorage
 const getAuthHeaders = () => {

@@ -59,18 +59,29 @@ export default function Product() {
   const relatedScanners = relatedData?.scanners || [];
 
   const handlePurchase = () => {
-    if (!scanner?.purchase_link) return;
+  if (!scanner?.purchase_link) return;
 
-    if (scanner.purchase_link.includes('whatsapp') || scanner.purchase_link.includes('wa.me')) {
-      const message = encodeURIComponent(`Olá, tenho interesse no scanner ${scanner.model} que vi no site.`);
-      const whatsappUrl = scanner.purchase_link.includes('?') 
-        ? `${scanner.purchase_link}&text=${message}`
-        : `${scanner.purchase_link}?text=${message}`;
-      window.open(whatsappUrl, '_blank');
-    } else {
-      window.open(scanner.purchase_link, '_blank');
+  if (scanner.purchase_link.includes('whatsapp') || scanner.purchase_link.includes('wa.me')) {
+    const message = encodeURIComponent(`Olá, tenho interesse no scanner ${scanner.model} que vi no site.`);
+    let whatsappUrl = scanner.purchase_link;
+
+    if (!whatsappUrl.startsWith('https://wa.me/')) {
+        const phoneNumber = whatsappUrl.replace(/[^0-9]/g, '');
+        whatsappUrl = `https://wa.me/${phoneNumber}`;
     }
-  };
+
+    if (whatsappUrl.includes('?')) {
+      whatsappUrl = `${whatsappUrl}&text=${message}`;
+    } else {
+      whatsappUrl = `${whatsappUrl}?text=${message}`;
+    }
+
+    window.open(whatsappUrl, '_blank');
+  } else {
+    window.open(scanner.purchase_link, '_blank');
+  }
+};
+
 
   if (isLoading) {
     return (
