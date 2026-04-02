@@ -68,16 +68,7 @@ export default function ProductGrid() {
 
   const itemsPerPage = 12;
 
-  // Buscar marcas disponíveis
-  const fetchBrands = async () => {
-    try {
-      const response = await api.getBrands();
-      setAvailableBrands(response.brands || []);
-    } catch (err) {
-      console.error('Erro ao carregar marcas:', err);
-      setAvailableBrands([]);
-    }
-  };
+ 
 
   // Função centralizada de busca
   // Usamos useCallback para garantir que a função não seja recriada desnecessariamente
@@ -143,7 +134,7 @@ export default function ProductGrid() {
   useEffect(() => {
     const loadInitialData = async () => {
       setIsLoading(true);
-      await fetchBrands();
+      
       await fetchScanners(1);
     };
     loadInitialData();
